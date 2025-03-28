@@ -4,10 +4,11 @@ from io import StringIO
 
 def fetch_station_data(station, start_date="2020-01-01", end_date="2025-03-28", sensor_num=6, dur_code='D'):
     """
-    Fetch reservoir data for a given station by calling the API.
+    Fetch reservoir data for a given station by calling the updated API endpoint.
     Returns a pandas DataFrame if successful, else None.
     """
-    base_url = "https://cdec.water.ca.gov/dynamicapp/selectQuery"
+    # Updated API endpoint
+    base_url = "https://cdec.water.ca.gov/dynamicapp/req/CSVDataServlet"
     params = {
         "Stations": station,
         "SensorNums": sensor_num,
@@ -18,7 +19,11 @@ def fetch_station_data(station, start_date="2020-01-01", end_date="2025-03-28", 
     try:
         response = requests.get(base_url, params=params)
         response.raise_for_status()
-        # Assume that the response is a CSV file.
+        # Print the incoming raw data from the API
+        #print("API response data:")
+       # print(response.text)
+        
+        # Assume that the response is a CSV file and convert to DataFrame.
         df = pd.read_csv(StringIO(response.text))
         return df
     except Exception as e:
@@ -43,3 +48,6 @@ def compute_stats(df):
         "avg_water_level": df['Value'].mean()
     }
     return stats
+
+
+#When you invoke `fetch_station_data` (for example, with `station="SHA"`), the code will use the new API endpoint URL, print the raw CSV data to your console, and then parse it into a pandas DataFrame.

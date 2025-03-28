@@ -10,13 +10,15 @@ def on_connect(client, userdata, flags, rc):
 
 class MQTTPublisher:
     def __init__(self, broker="localhost", port=1883):
-        self.client = mqtt.Client("ReservoirPublisher")
+        # Update client creation to include the callback_api_version parameter
+        self.client = mqtt.Client(client_id="ReservoirPublisher", callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
         self.client.on_connect = on_connect
         try:
             self.client.connect(broker, port, 60)
             self.client.loop_start()
         except Exception as e:
             print("Error connecting to MQTT broker:", e)
+
 
     def publish(self, station, stats):
         topic = f"reservoir/{station}"
