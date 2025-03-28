@@ -10,8 +10,8 @@ def on_connect(client, userdata, flags, rc):
 
 class MQTTPublisher:
     def __init__(self, broker="localhost", port=1883):
-        # Update client creation to include the callback_api_version parameter
-        self.client = mqtt.Client(client_id="ReservoirPublisher", callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
+        # Removed callback_api_version to avoid API version issues.
+        self.client = mqtt.Client(client_id="ReservoirPublisher")
         self.client.on_connect = on_connect
         try:
             self.client.connect(broker, port, 60)
@@ -19,14 +19,15 @@ class MQTTPublisher:
         except Exception as e:
             print("Error connecting to MQTT broker:", e)
 
-
-    def publish(self, station, stats):
+    def publish(self, station, data):
+        """
+        Publish the data (JSON string containing STATION_ID and VALUE fields)
+        to the topic for the given station.
+        """
         topic = f"reservoir/{station}"
         payload = {
             "station": station,
-            "max_water_level": stats.get("max_water_level"),
-            "min_water_level": stats.get("min_water_level"),
-            "avg_water_level": stats.get("avg_water_level")
+            "data": data
         }
         message = json.dumps(payload)
         result = self.client.publish(topic, message)
@@ -35,7 +36,6 @@ class MQTTPublisher:
             print(f"Published data to topic '{topic}': {message}")
         else:
             print(f"Failed to send message to topic {topic}")
-        # Pause briefly between messages.
         time.sleep(1)
 
     def disconnect(self):

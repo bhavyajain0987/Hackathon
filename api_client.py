@@ -25,6 +25,13 @@ def fetch_station_data(station, start_date="2020-01-01", end_date="2025-03-28", 
         
         # Assume that the response is a CSV file and convert to DataFrame.
         df = pd.read_csv(StringIO(response.text))
+         # Print the STATION_ID and VALUE fields (if available)
+        if 'STATION_ID' in df.columns and 'VALUE' in df.columns:
+            print("\nExtracted Data (STATION_ID and VALUE):")
+            print(df[['STATION_ID', 'VALUE']])
+        else:
+            print("\nColumns 'STATION_ID' or 'VALUE' not found in the API response data.")
+        
         return df
     except Exception as e:
         print(f"Error fetching data for station {station}: {e}")
@@ -33,19 +40,19 @@ def fetch_station_data(station, start_date="2020-01-01", end_date="2025-03-28", 
 def compute_stats(df):
     """
     Compute maximum, minimum and average water level from the DataFrame.
-    Assumes that the water level values are in a column named 'Value'.
+    Assumes that the water level values are in a column named 'VALUE'.
     """
-    # Ensure 'Value' is numeric.
-    df['Value'] = pd.to_numeric(df['Value'], errors='coerce')
-    df = df.dropna(subset=['Value'])
+    # Ensure 'VALUE' is numeric.
+    df['VALUE'] = pd.to_numeric(df['VALUE'], errors='coerce')
+    df = df.dropna(subset=['VALUE'])
 
     if df.empty:
         return None
 
     stats = {
-        "max_water_level": df['Value'].max(),
-        "min_water_level": df['Value'].min(),
-        "avg_water_level": df['Value'].mean()
+        "max_water_level": df['VALUE'].max(),
+        "min_water_level": df['VALUE'].min(),
+        "avg_water_level": df['VALUE'].mean()
     }
     return stats
 
