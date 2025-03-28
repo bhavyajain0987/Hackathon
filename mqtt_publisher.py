@@ -10,8 +10,8 @@ def on_connect(client, userdata, flags, rc):
 
 class MQTTPublisher:
     def __init__(self, broker="localhost", port=1883):
-        # Removed callback_api_version to avoid API version issues.
-        self.client = mqtt.Client(client_id="ReservoirPublisher")
+        # Specify parameters as keywords to avoid multiple values.
+        self.client = mqtt.Client(client_id="ReservoirPublisher", callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
         self.client.on_connect = on_connect
         try:
             self.client.connect(broker, port, 60)

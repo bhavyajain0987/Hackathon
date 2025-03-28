@@ -8,7 +8,7 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe("reservoir/+")
         print("[SUBSCRIBER] Subscribed to topic: reservoir/+")
     else:
-        print("[SUBSCRIBER] Connection failed with code", rc)
+        print(f"[SUBSCRIBER] Connection failed with code {rc}")
 
 def on_message(client, userdata, msg):
     try:
@@ -26,7 +26,7 @@ def on_message(client, userdata, msg):
         # Ensure the VALUE field is numeric.
         df['VALUE'] = pd.to_numeric(df['VALUE'], errors='coerce')
         df = df.dropna(subset=['VALUE'])
-            
+
         if not df.empty:
             max_val = df['VALUE'].max()
             min_val = df['VALUE'].min()
@@ -42,16 +42,15 @@ def on_message(client, userdata, msg):
 
 def main():
     print("[SUBSCRIBER] Starting MQTT subscriber...")
-    # Specify callback_api_version explicitly to VERSION1.
-    client = mqtt.Client("ReservoirSubscriber", callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
+    # Specify client_id and callback_api_version as keywords.
+    client = mqtt.Client(client_id="ReservoirSubscriber", callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
     client.on_connect = on_connect
     client.on_message = on_message
-
     try:
         client.connect("localhost", 1883, 60)
         client.loop_forever()
     except Exception as e:
-        print("[SUBSCRIBER] Error connecting to MQTT broker:", e)
+        print(f"[SUBSCRIBER] Error connecting to MQTT broker: {e}")
 
 if __name__ == "__main__":
     main()
