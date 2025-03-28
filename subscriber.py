@@ -12,6 +12,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     try:
+        print(f"[SUBSCRIBER] Received message on topic: {msg.topic}")
         payload = json.loads(msg.payload.decode())
         station = payload.get("station")
         data_str = payload.get("data")
@@ -31,7 +32,7 @@ def on_message(client, userdata, msg):
             max_val = df['VALUE'].max()
             min_val = df['VALUE'].min()
             avg_val = df['VALUE'].mean()
-            print(f"\n[SUBSCRIBER] Aggregated data for station {station}:")
+            print(f"\n[SUBSCRIBER] Aggregated data for station {station} on topic {msg.topic}:")
             print(f"    Max VALUE: {max_val}")
             print(f"    Min VALUE: {min_val}")
             print(f"    Avg VALUE: {avg_val}")
@@ -42,8 +43,7 @@ def on_message(client, userdata, msg):
 
 def main():
     print("[SUBSCRIBER] Starting MQTT subscriber...")
-    # Specify client_id and callback_api_version as keywords.
-    client = mqtt.Client(client_id="ReservoirSubscriber", callback_api_version=mqtt.CallbackAPIVersion.VERSION1)
+    client = mqtt.Client(client_id="ReservoirSubscriber")
     client.on_connect = on_connect
     client.on_message = on_message
     try:
